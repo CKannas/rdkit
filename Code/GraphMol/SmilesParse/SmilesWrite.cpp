@@ -68,7 +68,7 @@ namespace RDKit{
         //   - non-default isotope and writing isomeric smiles
         //   - atom-map information present
         const INT_VECT &defaultVs=PeriodicTable::getTable()->getValenceList(num);
-        int totalValence= atom->getExplicitValence()+atom->getImplicitValence();
+        int totalValence= atom->getTotalValence();
         bool nonStandard;
         nonStandard = std::find(defaultVs.begin(),defaultVs.end(),
                                 totalValence)==defaultVs.end();
@@ -420,7 +420,7 @@ namespace RDKit{
       }
     }
     if(canonical){
-      MolOps::rankAtoms(tmol,ranks);
+      MolOps::rankAtoms(tmol,ranks,true,doIsomericSmiles,doIsomericSmiles);
     } else {
       for(unsigned int i=0;i<tmol.getNumAtoms();++i) ranks[i]=i;
     }

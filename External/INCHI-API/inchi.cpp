@@ -1248,11 +1248,10 @@ namespace RDKit {
         unsigned int nAtoms = inchiOutput.num_atoms;
         for (unsigned int i = 0; i < nAtoms; i ++) {
           inchi_Atom* inchiAtom = &(inchiOutput.atom[i]);
-          Atom *atom = new Atom;
           // use element name to set atomic number
           int atomicNumber=periodicTable->getAtomicNumber(inchiAtom->elname);
-          atom->setAtomicNum(atomicNumber);
-          double averageWeight = periodicTable->getAtomicWeight(atomicNumber);
+          Atom *atom = new Atom(atomicNumber);
+          double averageWeight = atom->getMass();
           int refWeight=static_cast<int>(averageWeight+0.5);
           int isotope=0;
           if (inchiAtom->isotopic_mass) {
@@ -1405,6 +1404,11 @@ namespace RDKit {
                 originalRightNbr = indexToAtomIndexMapping[stereo0DPtr->neighbor[3]];
                 leftNbr = extraLeftNbr = rightNbr = extraRightNbr = -1;
                 Bond* bond = m->getBondBetweenAtoms(left, right);
+                if(!bond) {
+                  // Likely to be allene stereochemistry, which we don't handle.
+                  BOOST_LOG(rdWarningLog)<<"Extended double-bond stereochemistry (e.g. C=C=C=C) ignored"<<std::endl;
+                  continue;
+                }
                 // also find neighboring atoms. Note we cannot use what InChI returned
                 // in stereo0DPtr->neighbor as there can be hydrogen in it, which is
                 // later removed and is therefore not reliable. Plus, InChI seems to

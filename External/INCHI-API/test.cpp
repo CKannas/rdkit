@@ -166,6 +166,38 @@ void testGithubIssue8(){
   BOOST_LOG(rdInfoLog) <<"done" << std::endl;
 }
 
+void testGithubIssue40(){
+  BOOST_LOG(rdErrorLog) << "-------------------------------------" << std::endl;
+  BOOST_LOG(rdInfoLog) <<"testing github issue 40: bad MWs from inchis" << std::endl;
+  {
+    ExtraInchiReturnValues tmp;
+    std::string inchi="InChI=1S/C10H9N3O/c1-7-11-10(14)9(13-12-7)8-5-3-2-4-6-8/h2-6H,1H3,(H,11,12,14)";
+    ROMol *m = InchiToMol(inchi,tmp);
+    TEST_ASSERT(m);
+
+    double mw=Descriptors::calcAMW(*m);
+    TEST_ASSERT(feq(mw,187.202));
+    
+    delete m;
+  }
+  BOOST_LOG(rdInfoLog) <<"done" << std::endl;
+}
+
+void testGithubIssue67(){
+  BOOST_LOG(rdErrorLog) << "-------------------------------------" << std::endl;
+  BOOST_LOG(rdInfoLog) <<"testing github issue 67: seg fault from inchi" << std::endl;
+  {
+    ExtraInchiReturnValues tmp;
+    std::string inchi="InChI=1S/C18H17N3/c19-18(20)21-14-17-12-10-16(11-13-17)9-5-4-8-15-6-2-1-3-7-15/h1-3,6-13H,14H2,(H4,19,20,21)/b9-8+";
+    ROMol *m = InchiToMol(inchi,tmp);
+    TEST_ASSERT(m);
+    TEST_ASSERT(m->getNumAtoms()==21);
+    
+    delete m;
+  }
+  BOOST_LOG(rdInfoLog) <<"done" << std::endl;
+}
+
 
 //-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*-*
 //
@@ -175,4 +207,6 @@ int main(){
   testMultiThread();
   testGithubIssue3();
   testGithubIssue8();
+  testGithubIssue40();
+  testGithubIssue67();
 }

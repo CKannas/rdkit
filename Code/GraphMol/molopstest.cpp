@@ -1,6 +1,6 @@
 //  $Id$
 // 
-//   Copyright (C) 2002-2010 Greg Landrum and Rational Discovery LLC
+//   Copyright (C) 2002-2013 Greg Landrum and Rational Discovery LLC
 //
 //   @@ All Rights Reserved @@
 //  This file is part of the RDKit.
@@ -4216,7 +4216,42 @@ void testGitHubIssue8()
   BOOST_LOG(rdInfoLog) << "Finished" << std::endl;
 }
 
+void testGitHubIssue42()
+{
+  BOOST_LOG(rdInfoLog) << "-----------------------\n Testing Github issue 42 (impact of removeAtom on atom stereochem)" << std::endl;
+  {
+    std::string smi= "CCN1CCN(c2cc3[nH]c(C(=O)[C@@]4(CC)CC[C@](C)(O)CC4)nc3cc2Cl)CC1";
+    RWMol *m = SmilesToMol(smi);
+    TEST_ASSERT(m);
+    int indices[]={29, 28, 27, 26, 25, 24, 8, 7, 6, 5, 4, 3, 2, 1, 0,-1};
+    for(unsigned int i=0;indices[i]>-1;++i){
+      m->removeAtom((unsigned int)indices[i]);
+    }
+    smi=MolToSmiles(*m,true);
+    std::cerr<<"smiles: "<<smi<<std::endl;
+    delete m;
+  }
+  BOOST_LOG(rdInfoLog) << "Finished" << std::endl;
+}
 
+void testGitHubIssue65()
+{
+  BOOST_LOG(rdInfoLog) << "-----------------------\n Testing Github issue 65 (kekulization of boron-containing aromatic rings)" << std::endl;
+  {
+    std::string smi= "C[B-]1=CC=CC=C1";
+    RWMol *m = SmilesToMol(smi);
+    TEST_ASSERT(m);
+    TEST_ASSERT(m->getAtomWithIdx(1)->getIsAromatic());
+    TEST_ASSERT(m->getBondWithIdx(1)->getIsAromatic());
+
+    m->debugMol(std::cerr);
+    MolOps::Kekulize(*m);
+
+    
+    delete m;
+  }
+  BOOST_LOG(rdInfoLog) << "Finished" << std::endl;
+}
 
 int main(){
   RDLog::InitLogs();
@@ -4275,11 +4310,14 @@ int main(){
   testSFNetIssue3549146();
   testSFNetIssue249();
   testSFNetIssue256();
-#endif
   testSFNetIssue266();
   testSFNetIssue266();
   testSFNetIssue272();
   testGitHubIssue8();
+  testGitHubIssue42();
+#endif
+  testGitHubIssue65();
+
   return 0;
 }
 
